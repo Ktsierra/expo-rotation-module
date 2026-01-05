@@ -1,0 +1,10 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "expo-rotation-module": ["../src/index"],
+      "expo-rotation-module/*": ["../src/*"]
+    }
+  }
+}

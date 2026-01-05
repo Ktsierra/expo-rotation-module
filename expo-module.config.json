@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["ExpoRotationModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.rotationmodule.ExpoRotationModule"]
+  }
+}
