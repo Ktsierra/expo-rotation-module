@@ -1,6 +1,6 @@
 {
   "name": "expo-rotation-module",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Screen Orientation Native Module",
   "main": "index.js",
   "types": "src/index.d.ts",
