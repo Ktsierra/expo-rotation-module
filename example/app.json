@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "expo.modules.rotationmodule.example"
+      "bundleIdentifier": "ktsierra.expo.rotationmodule.example"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +23,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "expo.modules.rotationmodule.example"
+      "package": "ktsierra.expo.rotationmodule.example"
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -1,14 +1,20 @@
 import { registerWebModule, NativeModule } from 'expo';
 
 import { ExpoRotationModuleEvents } from './ExpoRotationModule.types';
+import type { RotationState } from './ExpoRotationModule';
 
 class ExpoRotationModule extends NativeModule<ExpoRotationModuleEvents> {
-  PI = Math.PI;
-  async setValueAsync(value: string): Promise<void> {
-    this.emit('onChange', { value });
+  async canWrite(): Promise<boolean> {
+    return true;
   }
-  hello() {
-    return 'Hello world! 👋';
+  requestWritePermission(): void {
+    // no-op on web
+  }
+  async getRotationState(): Promise<RotationState> {
+    return 'AUTOROTATE';
+  }
+  async setRotationState(state: RotationState): Promise<void> {
+    // no-op on web
   }
 }
 

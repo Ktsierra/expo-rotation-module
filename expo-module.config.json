@@ -4,6 +4,6 @@
     "modules": ["ExpoRotationModule"]
   },
   "android": {
-    "modules": ["expo.modules.rotationmodule.ExpoRotationModule"]
+    "modules": ["ktsierra.expo.rotationmodule.ExpoRotationModule"]
   }
 }

@@ -2,8 +2,8 @@
   "name": "expo-rotation-module",
   "version": "0.1.0",
   "description": "Screen Orientation Native Module",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "index.js",
+  "types": "src/index.d.ts",
   "scripts": {
     "build": "expo-module build",
     "clean": "expo-module clean",
@@ -22,6 +22,9 @@
     "ExpoRotationModule"
   ],
   "repository": "https://github.com/Ktsierra/expo-rotation-module",
+  "expo": {
+    "plugin": "./plugin/index.js"
+  },
   "bugs": {
     "url": "https://github.com/Ktsierra/expo-rotation-module/issues"
   },
