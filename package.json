@@ -31,11 +31,13 @@
   "author": "Ktsierra <josejaviersierra1998@gmail.com> (https://github.com/Ktsierra)",
   "license": "MIT",
   "homepage": "https://github.com/Ktsierra/expo-rotation-module#readme",
-  "dependencies": {},
+  "dependencies": {
+    "@expo/npm-proofread": "^1.0.1"
+  },
   "devDependencies": {
     "@types/react": "~19.1.0",
-    "expo-module-scripts": "^5.0.8",
     "expo": "^54.0.27",
+    "expo-module-scripts": "^5.0.8",
     "react-native": "0.81.5"
   },
   "peerDependencies": {
