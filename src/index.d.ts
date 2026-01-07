@@ -1,4 +1,4 @@
-export type RotationState = "AUTOROTATE" | "PORTRAIT" | "LANDSCAPE";
+export type RotationState = 'AUTOROTATE' | 'PORTRAIT' | 'LANDSCAPE';
 
 export function canWrite(): Promise<boolean>;
 export function requestWritePermission(): void;

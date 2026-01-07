@@ -49,7 +49,7 @@ import Rotation, {
 
 - `canWrite(): Promise<boolean>` — returns true if the app has `WRITE_SETTINGS` granted (Android M+). Returns `true` on older OS versions.
 - `requestWritePermission(): void` — opens the Android Settings screen where the user can grant the permission for your app.
-- `getRotationState(): Promise<'AUTOROTATE'|'PORTRAIT'|'LANDSCAPE'>` — reads the current global rotation state.
+- `getRotationState(): Promise<'AUTOROTATE'|'PORTRAIT'|'LANDSCAPE'>` — reads the current global rotation state. The module reports the coarse axis (PORTRAIT or LANDSCAPE); within those axes the system sensor still allows regular or inverted orientations when auto-rotate is off.
 - `setRotationState(state): Promise<void>` — sets the rotation state. Rejects with an Error that may contain a `code` property (e.g. `E_PERMISSION`).
 - `getPackageName(): Promise<string>` — returns the package name the native module is using (useful for diagnostics).
 
