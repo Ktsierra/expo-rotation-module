@@ -11,6 +11,14 @@ import android.util.Log
 import android.content.pm.ActivityInfo
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import kotlin.math.atan2
+import kotlin.math.sqrt
+import kotlin.math.abs
+
 
 class ExpoRotationModule : Module() {
   companion object {
@@ -21,6 +29,19 @@ class ExpoRotationModule : Module() {
   private var orientationListener: android.view.OrientationEventListener? = null
   private var desiredAxis: String? = null
   private var lastWrittenRotation: Int = -1
+
+  // Sensor-related fields for tilt detection and debouncing
+  private var sensorManager: SensorManager? = null
+  private var accelSensor: Sensor? = null
+  private var accelListener: SensorEventListener? = null
+  // tilt threshold (degrees) below which device is considered "flat"
+  private val tiltThresholdDegrees = 20f
+  // debounce: must see same rot candidate this many times before writing
+  private var stableCount = 0
+  private val stableRequired = 3
+  private var lastRotCandidate = -1
+  // last measured inclination in degrees (0 = flat, 90 = upright)
+  private var lastInclinationDeg = 90f
 
   override fun definition() = ModuleDefinition {
     Name(NAME)
@@ -51,6 +72,22 @@ class ExpoRotationModule : Module() {
       orientationListener?.disable()
       orientationListener = null
       desiredAxis = null
+      lastWrittenRotation = -1
+      // unregister accelerometer listener if registered
+      try {
+        if (sensorManager != null && accelListener != null) {
+          sensorManager?.unregisterListener(accelListener)
+        }
+      } catch (e: Exception) {
+        Log.e(TAG, "stopOrientationListener sensor unregister error", e)
+      }
+      accelListener = null
+      accelSensor = null
+      sensorManager = null
+      // reset debounce
+      stableCount = 0
+      lastRotCandidate = -1
+      lastInclinationDeg = 90f
       return@Function null
     }
 
@@ -165,6 +202,32 @@ class ExpoRotationModule : Module() {
     // If listener already exists, do nothing
     if (orientationListener != null) return
 
+    // set up accelerometer to measure inclination
+    sensorManager = ctx.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
+    accelSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    accelListener = object : SensorEventListener {
+      override fun onSensorChanged(event: SensorEvent) {
+        val x = event.values[0].toDouble()
+        val y = event.values[1].toDouble()
+        val z = event.values[2].toDouble()
+        val g = sqrt(x * x + y * y + z * z)
+        if (g > 0.0) {
+          var inclRad = atan2(z, sqrt(x * x + y * y))
+          var inclDeg = Math.toDegrees(inclRad).toFloat()
+          inclDeg = abs(inclDeg)
+          // clamp
+          if (inclDeg > 90f) inclDeg = 90f
+          lastInclinationDeg = inclDeg
+        }
+      }
+
+      override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+    }
+    if (accelSensor != null) {
+      // Use UI delay for reasonable responsiveness
+      sensorManager?.registerListener(accelListener, accelSensor, SensorManager.SENSOR_DELAY_UI)
+    }
+
     orientationListener = object : android.view.OrientationEventListener(ctx) {
       override fun onOrientationChanged(orientation: Int) {
         // orientation: 0..359 degrees, or ORIENTATION_UNKNOWN (-1)
@@ -179,6 +242,23 @@ class ExpoRotationModule : Module() {
 
         try {
           val resolver: ContentResolver = ctx.contentResolver
+
+          // If device is nearly flat, skip writing to avoid noise
+          if (lastInclinationDeg < tiltThresholdDegrees) {
+            lastRotCandidate = -1
+            stableCount = 0
+            return
+          }
+
+          // Debounce: require several consistent buckets
+          if (rot == lastRotCandidate) {
+            stableCount += 1
+          } else {
+            lastRotCandidate = rot
+            stableCount = 1
+          }
+          if (stableCount < stableRequired) return
+
           // desiredAxis controls whether we want portrait or landscape axis.
           when (desiredAxis) {
             "PORTRAIT" -> {
